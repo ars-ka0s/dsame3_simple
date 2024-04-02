@@ -4,13 +4,14 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "dsame3_simple"
-version = "0.0.1"
+version = "0.0.1-1"
 dependencies = [
 ]
 authors = [
-    { name="Joseph W. Metcalf"},
-    { name="James Kitchens"},
-    { name="Matthew R. McDougal", email="ka0s@arrl.net"}
+    { name="Joseph W. Metcalf" },
+    { name="James Kitchens" },
+    { name="Matthew R. McDougal" },
+    { name="Matthew R. McDougal", email="ka0s@arrl.net" }
 ]
 description = "Simplified version of dsame3 to decode EAS SAME messages to readable text."
 readme = "README.md"
