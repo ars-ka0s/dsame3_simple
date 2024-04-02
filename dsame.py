@@ -220,7 +220,7 @@ def format_message(command, ORG='WXR', EEE='RWT', PSSCCC=None, TTTT='0030', JJJH
 
 
 def readable_message(ORG='WXR', EEE='RWT', PSSCCC=None, TTTT='0030', JJJHHMM='0010000', STATION=None, TYPE=None,
-                     LLLLLLLL=None, COUNTRY='US', LANG='EN'):
+                     LLLLLLLL=None, COUNTRY='US', LANG='EN', wraplen=78):
     if PSSCCC is None:
         PSSCCC = []
     printf()
@@ -245,10 +245,14 @@ def readable_message(ORG='WXR', EEE='RWT', PSSCCC=None, TTTT='0030', JJJHHMM='00
             punc=',' if idx != len(PSSCCC) - 1 else '.')]
     MSG += [defs.MSG__TEXT[LANG]['MSG4']]
     MSG += [''.join(['(', LLLLLLLL, ')'])]
-    output = textwrap.wrap(''.join(MSG), 78)
-    for item in output:
-        printf(item)
-    printf()
+    if wraplen > 0:
+        output = textwrap.wrap(''.join(MSG), 78)
+        for item in output:
+            printf(item)
+        printf()
+    else:
+        printf(''.join(MSG))
+
     return ''.join(MSG)
 
 
@@ -377,7 +381,7 @@ def same_decode(same, lang, same_watch=None, event_watch=None, call=None, comman
             PSSCCC_list.sort()
             if check_watch(same_watch, PSSCCC_list, event_watch, EEE):
                 MESSAGE = readable_message(ORG, EEE, PSSCCC_list, TTTT, JJJHHMM, STATION, TYPE, LLLLLLLL, COUNTRY,
-                                           lang)
+                                           lang, args.wrap)
                 if command:
                     if call:
                         l_cmd = []
@@ -417,6 +421,7 @@ def parse_arguments():
                         help='show version infomation and exit')
     parser.add_argument('--call', help='call external command')
     parser.add_argument('--command', nargs='*', help='command message')
+    parser.add_argument('--wrap', type=int, default=78, help='line wrap length')
     args, unknown = parser.parse_known_args()
     return args
 

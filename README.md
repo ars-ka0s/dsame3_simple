@@ -11,17 +11,11 @@ This program was originally written by [cuppa_joe](https://github.com/cuppa-joe/
 
 ###Requirements
 
-* [Python](https://www.python.org/) 3.11+
-* (OPTIONAL, UNLESS USING AUDIO DEMODULATION) A [weather radio](www.nws.noaa.gov/nwr/), [RTL-SDR](http://www.rtl-sdr.com/about-rtl-sdr/) or other receiving/source device (ex. Microphone)
-* A demodulator, such as [multimon-ng](https://github.com/EliasOenal/multimon-ng/) ([Windows binaries](https://github.com/cuppa-joe/multimon-ng/releases))
-
-NOTE: If you are a Windows user, you may not need to install any software listed above, as the new dependency checker will take care of installing those programs for you
+* [Python](https://www.python.org/) 3
 
 ###Installation
 
-For Microsoft Windows, **dsame3** is distributed as a self-extracting installer, and downloads for 64-bit and 32-bit systems are available. Run the installer to install the program and optionally multimon-ng and/or rtl_fm.
-
-For Linux and similar systems, **dsame3** is available as a compressed (tar.gz or zip) archive which contains the program source. The source repository can also be cloned using `git`. Extract and run `dsame.py` using the python interpreter.
+`pipx install dsame3_simple`
 
 Check [here](https://github.com/jamieden/dsame3/releases/latest) to download the latest release.
 
@@ -30,13 +24,8 @@ Check [here](https://github.com/jamieden/dsame3/releases/latest) to download the
 ```
 usage: dsame [-h] [--msg MSG] [--same [SAME [SAME ...]]]
              [--event [EVENT [EVENT ...]]] [--lang LANG]
-             [--loglevel {10,20,30,40,50}] [--text] [--no-text] [--version]
-             [--call CALL] [--command COMMAND] [--source SOURCE] [--frequency FREQ]
-             [--ppm PPM] [--record PATH] [--transcribe PATH] 
-             [--transcription_model {small,medium,large}]
-             [--transcription_device {cpu, cuda, auto}] 
-             [--transcription_compute {int8, int8_float16, int16, float16, float32}]
-             [--transcription_beam_size SIZE]
+             [--loglevel {10,20,30,40,50}] [--version]
+             [--call CALL] [--command COMMAND]
 ```
 ####Options
 
@@ -46,31 +35,16 @@ Option            | Description                                                 
 `same`            | List of SAME codes to monitor                                         | `--same 029165 029095`
 `event`           | List of event codes to monitor                                        | `--event RWT TOR SVR`
 `loglevel`        | Set log level                                                         | `--loglevel 10`
-`text`, `no-text` | Output/Omit readable message text                                     | `--text`, `--no-text`
 `call`            | Call an external program                                              | `--call alert.sh`
 `lang`            | Selects the language for the program**                                | `--lang EN`
 `command`         | External command line. Omit --call to send to standard output         | `--command "Event Code: {EEE}"`
-`source`          | Source script/program. See /scripts for examples                      | `--source source.sh`
-`frequency`       | Set the RTL_FM frequency (in MHz)                                     | `--frequency 162.475`
-`ppm`             | Set the RTL_FM PPM (Parts Per Million)                                | `--ppm 0`
-`record`          | Records default input and saves the recording to the specified path   | `--record "Recordings"` OR `--record "C:\Recordings"`
-`transcribe`      | Creates a text file with a transcription of the alert message and saves it to the specified path (THE RECORD OPTION IS REQUIRED FOR THE TRANSCRIBE FEATURE TO WORK) | `--transcribe "Transcriptions"` OR `--transcribe "C:\Transcriptions"`
-`transcription_model` | Sets the transcription model level*** (The higher the level, the more time and resources it takes) | `--transcription_model medium`
-`transcription_device` | Sets the device used for computation of the transcrtiption model (CURRENTLY, ONLY CPU WORKS) | `--transcription_device cpu`
-`transcription_compute` | Choose the compute method for transcription. NOTE: only certain computation choices will work with certain devices. | `--transcription_device float32`
-`transcription_beam_size` | Choose the beam size for transcription. NOTE: The higher the beam size, the more accurate the transcription will be, but the more time and resources it will take. | `--transcription_beam_size 5`
+`wrap`            | Line length to wrap message (0 for no wrap)                           | `--wrap 80`
 
 ** The only available language options so far are English (EN) and Spanish (SP). The program defaults to English. 
 
-*** These models are originally from [guillamekln](https://huggingface.co/guillaumekln). Because of file size limits, the "model.bin" file for "Model/large-v2" is missing. Please download it from [here](https://huggingface.co/guillaumekln/faster-whisper-large-v2/resolve/main/model.bin) and move it to "Model/large-v2". 
-
 ###Usage
 
-**dsame3** can decode EAS messages from the command line, directly from the output of an external command, or by capturing the ouput of a shell script/batch file or external program. Use `msg` for command line decoding. The `source` command is used to capture and decode the output of a script or program. Without one of these options, standard input is used. Press `CTRL-C` to exit the program.
-
-####Source Scripts
-
-Several sample source scripts and Windows batch files are provided in the `scripts` directory. If you are using a RTL-SDR device, edit the script to set the frequency, receiver gain and PPM error rate.
+**dsame3** can decode EAS messages from the command line, directly from the output of an external command, or by capturing the ouput of a shell script/batch file or external program. Use `msg` for single command line decoding. Without this option, standard input is used. Press `CTRL-C` to exit the program.
 
 ###Filtering Alerts
 
@@ -158,31 +132,23 @@ Decoding from a text file using standard input:
 
 `cat zczc.txt | dsame.py --same 029165`
 
-Using a source script to decode from standard input:
-
-`dsame.py --same 029165 --source source.sh`
 
 Call an external script with the event type and length:
 
-`dsame.py --same 029165 --source source.sh --call alert.sh --command "{length}" "{event}"`
+`dsame.py --same 029165 --call alert.sh --command "{length}" "{event}"`
 
 Decoding a message from the command line:
 
 `dsame.py --msg "ZCZC-WXR-RWT-020103-020209-020091-020121-029047-029165-029095-029037+0030-1051700-KEAX/NWS" --text`
 
-Print an encoded alert string, and omit the alert text:
-
-`dsame.py --source source.sh --no-text --command "ZCZC-{ORG}-{EEE}-{PSSCCC}+{TTTT}-{JJJHHMM}-{LLLLLLLL}-"`
-
 Send an alert to a [Pushbullet](https://www.pushbullet.com) channel:
 
-`dsame.py --source source.sh --call pushbullet-channel.sh --command "{event}" "{MESSAGE}"`
+`dsame.py --call pushbullet-channel.sh --command "{event}" "{MESSAGE}"`
 
 ###Sample Text Output
 
 >The National Weather Service in Pleasant Hill, Missouri has issued a Required Weekly Test valid until 12:30 PM for the following counties in Kansas: Leavenworth, Wyandotte, Johnson, Miami, and for the following counties in Missouri: Clay, Platte, Jackson, Cass. (KEAX/NWS)
 
-This [experimental Pushbullet channel](https://www.pushbullet.com/channel?tag=xoynq-weather) is updated using dsame3, multimon-ng and a rtl-sdr dongle on a Raspberry Pi 2.
 
 ###Known Issues
 
