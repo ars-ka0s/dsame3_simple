@@ -220,10 +220,9 @@ def format_message(command, ORG='WXR', EEE='RWT', PSSCCC=None, TTTT='0030', JJJH
 
 
 def readable_message(ORG='WXR', EEE='RWT', PSSCCC=None, TTTT='0030', JJJHHMM='0010000', STATION=None, TYPE=None,
-                     LLLLLLLL=None, COUNTRY='US', LANG='EN', wraplen=78):
+                     LLLLLLLL=None, COUNTRY='US', LANG='EN', wraplen=78, noprint=False):
     if PSSCCC is None:
         PSSCCC = []
-    printf()
     location = get_location(STATION, TYPE)
     MSG = [format_message(defs.MSG__TEXT[LANG]['MSG1'], ORG=ORG, EEE=EEE, TTTT=TTTT, JJJHHMM=JJJHHMM, STATION=STATION,
                           TYPE=TYPE, COUNTRY=COUNTRY, LANG=LANG,
@@ -245,13 +244,15 @@ def readable_message(ORG='WXR', EEE='RWT', PSSCCC=None, TTTT='0030', JJJHHMM='00
             punc=',' if idx != len(PSSCCC) - 1 else '.')]
     MSG += [defs.MSG__TEXT[LANG]['MSG4']]
     MSG += [''.join(['(', LLLLLLLL, ')'])]
-    if wraplen > 0:
-        output = textwrap.wrap(''.join(MSG), 78)
-        for item in output:
-            printf(item)
+    if not noprint:
         printf()
-    else:
-        printf(''.join(MSG))
+        if wraplen > 0:
+            output = textwrap.wrap(''.join(MSG), 78)
+            for item in output:
+                printf(item)
+            printf()
+        else:
+            printf(''.join(MSG))
 
     return ''.join(MSG)
 
@@ -273,6 +274,106 @@ def clean_msg(same):
 
     return same
 
+
+def same_decode_string(same, lang='EN', same_watch=None, event_watch=None, wraplen=0):
+    msgs = []
+    while len(same):
+        # noinspection PyUnusedLocal
+        tail = same
+        # noinspection PyBroadException
+        try:
+            same = clean_msg(same)
+        except:
+            return []
+        msgidx = same.find('ZCZC')
+        endidx = same.find('NNNN')
+        if msgidx != -1 and (endidx == -1 or endidx > msgidx):
+            # New message
+            # noinspection PyUnusedLocal
+            S1, S2 = None, None
+            # noinspection PyBroadException
+            try:
+                S1, S2 = same[msgidx:].split('+', 1)
+            except:
+                return []
+            # noinspection PyBroadException
+            try:
+                ZCZC, ORG, EEE, PSSCCC = S1.split('-', 3)
+            except:
+                return []
+            # noinspection PyBroadException
+            try:
+                PSSCCC_list = PSSCCC.split('-')
+            except:
+                pass
+            # noinspection PyBroadException
+            try:
+                TTTT, JJJHHMM, LLLLLLLL, tail = S2.split('-', 3)
+            except:
+                return []
+            # noinspection PyBroadException
+            try:
+                STATION, TYPE = LLLLLLLL.split('/')
+            except ValueError:
+                # Station doesn't have to have a /
+                STATION = LLLLLLLL
+                TYPE = None
+                pass
+            except:
+                STATION, TYPE = None, None
+            US_bad_list = []
+            CA_bad_list = []
+            MX_bad_list = []
+            for code in PSSCCC_list:
+                try:
+                    # noinspection PyUnusedLocal
+                    county = defs.US_SAME_CODE[code[1:]]
+                except KeyError:
+                    US_bad_list.append(code)
+                try:
+                    # noinspection PyUnusedLocal
+                    county = defs.CA_SAME_CODE[code[1:]]
+                except KeyError:
+                    CA_bad_list.append(code)
+                try:
+                    # noinspection PyUnusedLocal
+                    county = defs.MX_SAME_CODE[code[1:]]
+                except KeyError:
+                    MX_bad_list.append(code)
+            if len(US_bad_list) < len(CA_bad_list) and len(US_bad_list) < len(MX_bad_list):
+                COUNTRY = 'US'
+            if len(US_bad_list) > len(CA_bad_list) and len(CA_bad_list) < len(MX_bad_list):
+                COUNTRY = 'CA'
+            if len(US_bad_list) > len(MX_bad_list) and len(CA_bad_list) > len(MX_bad_list):
+                COUNTRY = 'MX'
+            if len(US_bad_list) == len(MX_bad_list) and len(US_bad_list) == len(CA_bad_list):
+                if type == 'CA':
+                    COUNTRY = 'CA'
+                elif type == 'MX':
+                    COUNTRY = 'MX'
+                else:
+                    COUNTRY = 'US'
+            # noinspection PyUnboundLocalVariable
+            if COUNTRY == 'CA':
+                bad_list = CA_bad_list
+            elif COUNTRY == 'MX':
+                bad_list = MX_bad_list
+            elif COUNTRY == 'US':
+                bad_list = US_bad_list
+            for code in bad_list:
+                PSSCCC_list.remove(code)
+            PSSCCC_list.sort()
+            if check_watch(same_watch, PSSCCC_list, event_watch, EEE):
+                msgs += [readable_message(ORG, EEE, PSSCCC_list, TTTT, JJJHHMM, STATION, TYPE, LLLLLLLL, COUNTRY,
+                                           lang, wraplen, True)]
+        else:
+            if endidx == -1:
+                return msgs
+            else:
+                tail = same[msgidx:+len('NNNN')]
+        # Move ahead and look for more
+        same = tail
+    return msgs
 
 def same_decode(same, lang, same_watch=None, event_watch=None, call=None, command=None):
     args = parse_arguments()
