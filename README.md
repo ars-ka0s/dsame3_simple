@@ -11,7 +11,7 @@ This program was originally written by [cuppa_joe](https://github.com/cuppa-joe/
 
 ###Requirements
 
-* [Python](https://www.python.org/) 3
+* [Python](https://www.python.org/) 3.8+
 
 ###Installation
 
@@ -22,10 +22,10 @@ Check [here](https://github.com/jamieden/dsame3/releases/latest) to download the
 ###Command Line Options
 
 ```
-usage: dsame [-h] [--msg MSG] [--same [SAME [SAME ...]]]
-             [--event [EVENT [EVENT ...]]] [--lang LANG]
-             [--loglevel {10,20,30,40,50}] [--version]
-             [--call CALL] [--command COMMAND]
+usage: dsame3_simple [-h] [--msg MSG] [--same [SAME [SAME ...]]]
+                     [--event [EVENT [EVENT ...]]] [--lang LANG]
+                     [--loglevel {10,20,30,40,50}] [--version]
+                     [--call CALL] [--command COMMAND]
 ```
 ####Options
 
@@ -130,20 +130,19 @@ Variable        | Description                       | Example
 
 Decoding from a text file using standard input:
 
-`cat zczc.txt | dsame.py --same 029165`
-
+`cat zczc.txt | dsame3_simple --same 029165`
 
 Call an external script with the event type and length:
 
-`dsame.py --same 029165 --call alert.sh --command "{length}" "{event}"`
+`dsame3_simple --same 029165 --call alert.sh --command "{length}" "{event}"`
 
 Decoding a message from the command line:
 
-`dsame.py --msg "ZCZC-WXR-RWT-020103-020209-020091-020121-029047-029165-029095-029037+0030-1051700-KEAX/NWS" --text`
+`dsame3_simple --msg "ZCZC-WXR-RWT-020103-020209-020091-020121-029047-029165-029095-029037+0030-1051700-KEAX/NWS" --text`
 
 Send an alert to a [Pushbullet](https://www.pushbullet.com) channel:
 
-`dsame.py --call pushbullet-channel.sh --command "{event}" "{MESSAGE}"`
+`dsame3_simple --call pushbullet-channel.sh --command "{event}" "{MESSAGE}"`
 
 ###Sample Text Output
 

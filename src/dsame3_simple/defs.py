@@ -1,6 +1,6 @@
-VERSION = '0.3.2.0'
-PROGRAM = 'dsame'
-DESCRIPTION = 'dsame is a program to decode EAS/SAME alert messages'
+VERSION = '0.0.1'
+PROGRAM = 'dsame3_simple'
+DESCRIPTION = 'dsame3_simple is a program to decode EAS/SAME alert messages'
 COPYRIGHT = 'Copyright (C) 2016 Joseph W. Metcalf\nModified by James Kitchens 2023'
 
 TEST_STRING = 'EAS: ZCZC-WXR-RWT-055027-055039-055047-055117-055131-055137-055139-055015-055071+0030-0771800-KMKX/NWS-'

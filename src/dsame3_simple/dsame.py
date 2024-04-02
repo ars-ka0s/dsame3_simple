@@ -23,7 +23,6 @@
 import argparse
 import calendar
 import datetime
-import defs
 import logging
 import string
 import subprocess
@@ -31,6 +30,7 @@ import sys
 import textwrap
 import time
 
+from . import defs
 
 def alert_start(JJJHHMM, format1='%j%H%M'):
     """Convert EAS date string to datetime format"""
@@ -435,11 +435,10 @@ def main():
         same_decode(args.msg, args.lang, same_watch=args.same, event_watch=args.event,
                     call=args.call, command=args.command)
     else:
-        while True:
-            for line in sys.stdin:
-                logging.debug(line)
-                same_decode(line, args.lang, same_watch=args.same, event_watch=args.event,
-                            call=args.call, command=args.command)
+        for line in sys.stdin:
+            logging.debug(line)
+            same_decode(line, args.lang, same_watch=args.same, event_watch=args.event,
+                        call=args.call, command=args.command)
 
 
 if __name__ == "__main__":
