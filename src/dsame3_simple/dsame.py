@@ -364,8 +364,19 @@ def same_decode_string(same, lang='EN', same_watch=None, event_watch=None, wrapl
                 PSSCCC_list.remove(code)
             PSSCCC_list.sort()
             if check_watch(same_watch, PSSCCC_list, event_watch, EEE):
-                msgs += [readable_message(ORG, EEE, PSSCCC_list, TTTT, JJJHHMM, STATION, TYPE, LLLLLLLL, COUNTRY,
-                                           lang, wraplen, True)]
+                msg = {
+                    'originator': ORG,
+                    'event': EEE,
+                    'country': COUNTRY,
+                    'areas': PSSCCC_list,
+                    'start_time': alert_start(JJJHHMM),
+                    'duration': alert_length(TTTT),
+                    'end_time': alert_end(JJJHHMM, TTTT),
+                    'station': LLLLLLLL,
+                    'msg': readable_message(ORG, EEE, PSSCCC_list, TTTT, JJJHHMM, STATION, TYPE, LLLLLLLL, COUNTRY,
+                                           lang, wraplen, True)
+                }
+                msgs += [msg]
         else:
             if endidx == -1:
                 return msgs
