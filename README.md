@@ -1,25 +1,25 @@
 # dsame3
-Python EAS SAME Alert Message Decoder
+Python EAS SAME Alert Message Decoder, simplified
 
-**dsame3** is a program to decode [EAS](http://en.wikipedia.org/wiki/Emergency_Alert_System)/[SAME](http://en.wikipedia.org/wiki/Specific_Area_Message_Encoding) (Emergency Alert System/Specific Area Message Encoding) alert messages. These messages are primarily used by the National Weather Service for weather-related warnings. **dsame** will decode a demodulated message, filter by SAME ([US](http://www.nws.noaa.gov/nwr/coverage/county_coverage.html)/[CA](http://www.ec.gc.ca/meteo-weather/default.asp?lang=En&n=E5A4F19C-1)) and/or event code, provide readable text, or run an external program.
+**dsame3_simple** is a program to decode [EAS](http://en.wikipedia.org/wiki/Emergency_Alert_System)/[SAME](http://en.wikipedia.org/wiki/Specific_Area_Message_Encoding) (Emergency Alert System/Specific Area Message Encoding) alert messages. These messages are primarily used by the National Weather Service for weather-related warnings. **dsame** will decode a demodulated message, filter by SAME ([US](http://www.nws.noaa.gov/nwr/coverage/county_coverage.html)/[CA](http://www.ec.gc.ca/meteo-weather/default.asp?lang=En&n=E5A4F19C-1)) and/or event code, provide readable text, or run an external program.
 
 **DO NOT RELY ON THIS PROGRAM WHEN LOSS, DAMAGE, INJURY OR DEATH MAY OCCUR!**
 
-###NOTICE
+### NOTICE
 
 This program was originally written by [cuppa_joe](https://github.com/cuppa-joe/dsame), and was rewritten to include new updates and upgrade compatibility so others can modify the code without the headache of trying to work with Python 2.7. THIS IS NOT MY ORIGINAL CODE! I have modified it, and I will be updating it as necessary, since updates seem to have stopped on the original repository. 
 
-###Requirements
+Simplfied by [ars-ka0s](https://github.com/ars-ka0s) to remove several features such as transcription and recording that required specific libraries and OS support to make a pure python no dependency utility.
+
+### Requirements
 
 * [Python](https://www.python.org/) 3.8+
 
-###Installation
+### Installation
 
-`pipx install dsame3_simple`
+`pip install dsame3_simple`
 
-Check [here](https://github.com/jamieden/dsame3/releases/latest) to download the latest release.
-
-###Command Line Options
+### Command Line Options
 
 ```
 usage: dsame3_simple [-h] [--msg MSG] [--same [SAME [SAME ...]]]
@@ -27,7 +27,7 @@ usage: dsame3_simple [-h] [--msg MSG] [--same [SAME [SAME ...]]]
                      [--loglevel {10,20,30,40,50}] [--version]
                      [--call CALL] [--command COMMAND]
 ```
-####Options
+#### Options
 
 Option            | Description                                                           | Example
 :-----------------|:----------------------------------------------------------------------|:----------------------
@@ -42,15 +42,17 @@ Option            | Description                                                 
 
 ** The only available language options so far are English (EN) and Spanish (SP). The program defaults to English. 
 
-###Usage
+### Usage
 
-**dsame3** can decode EAS messages from the command line, directly from the output of an external command, or by capturing the ouput of a shell script/batch file or external program. Use `msg` for single command line decoding. Without this option, standard input is used. Press `CTRL-C` to exit the program.
+**dsame3_simple** can decode EAS messages from the command line, directly from the output of an external command, or by capturing the ouput of a shell script/batch file or external program. Use `msg` for single command line decoding. Without this option, standard input is used. Press `CTRL-C` to exit the program.
 
-###Filtering Alerts
+The dsame3_simple.dsame.same_decode_string function can be used to decode programmatically as a library.
 
-There are two comands used to filter alerts. None, one or both can be specified. The `same` command is a list of SAME area codes ([United States](http://www.nws.noaa.gov/nwr/coverage/county_coverage.html)/[Canada](http://www.ec.gc.ca/meteo-weather/default.asp?lang=En&n=E5A4F19C-1)), and the `event` command is a list of event codes to monitor.
+### Filtering Alerts
 
-####Event Codes
+There are two commands used to filter alerts. None, one or both can be specified. The `same` command is a list of SAME area codes ([United States](http://www.nws.noaa.gov/nwr/coverage/county_coverage.html)/[Canada](http://www.ec.gc.ca/meteo-weather/default.asp?lang=En&n=E5A4F19C-1)), and the `event` command is a list of event codes to monitor.
+
+#### Event Codes
 
 *This list includes current and proposed event codes.*
 
@@ -99,11 +101,11 @@ WSW | Winter Storm Warning         |SQW | Snow Squall Warning*
 
 An alert must match one of each specified alert type in order to be processed. If an alert type is omitted, any alert will match that type. In most cases, using only SAME codes to filter alerts will be the best option.
 
-###External Commands
+### External Commands
 
 The `call` option runs an external program, script/batch file for each alert.  The `command` option defines the command string sent to that program, script or batch file, or to standard output if the `call` option is omitted. The following variables can be used in command strings.
 
-####Command Variables
+#### Command Variables
 
 Variable        | Description                       | Example
 :---------------|:----------------------------------|:------------------
@@ -126,7 +128,7 @@ Variable        | Description                       | Example
  {MESSAGE}      | Readable message                  | *(See sample text output below)*
 
 
-###Sample Commands
+### Sample Commands
 
 Decoding from a text file using standard input:
 
@@ -144,12 +146,12 @@ Send an alert to a [Pushbullet](https://www.pushbullet.com) channel:
 
 `dsame3_simple --call pushbullet-channel.sh --command "{event}" "{MESSAGE}"`
 
-###Sample Text Output
+### Sample Text Output
 
 >The National Weather Service in Pleasant Hill, Missouri has issued a Required Weekly Test valid until 12:30 PM for the following counties in Kansas: Leavenworth, Wyandotte, Johnson, Miami, and for the following counties in Missouri: Clay, Platte, Jackson, Cass. (KEAX/NWS)
 
 
-###Known Issues
+### Known Issues
 
 * ~~SASMEX/SARMEX, a Mexican system for seismic alerts, is not implemented due to lack of documentation.~~ This issue has *HOPEFULLY* been resolved
 * ~~A correct and complete list of ICAO location codes used by the National Weather Service messages is not available.~~ This issue has *HOPEFULLY* been resolved
